@@ -1,4 +1,4 @@
-export const LANGS=['en','uk','tr','ar','ru','fa'];
+export const LANGS=['en','uk','tr','ar','ru','fa','es'];
 export const STORE={words:'wortgarten.v1',grammar:'wortgarten.grammar.v1',settings:'wortgarten.settings.v2',activity:'wortgarten.activity.v2'};
 export const keyOf=w=>w.de.replace(/ \(Sg\.\)/g,'').trim();
 export const normalize=s=>s.normalize('NFC').trim().toLocaleLowerCase('de').replace(/ß/g,'ss').replace(/[.!?]+$/,'').replace(/\s+/g,' ');

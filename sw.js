@@ -1,6 +1,6 @@
 /* Build-generated cache version. Do not reuse a version after changing files. */
 const PREFIX='wortgarten-pwa:'+self.registration.scope+':';
-const CACHE=PREFIX+'3d9af3b9f4e20480';
+const CACHE=PREFIX+'97b95eeafa79cd92';
 const FILES=["./index.html", "./grammar.html", "./style.css", "./app.js", "./core.js", "./i18n.js", "./icons.js", "./manifest.webmanifest", "./assets/icon-192.png", "./assets/icon-512.png", "./assets/icon.svg", "./assets/maskable-512.png", "./content/catalog.json", "./content/grammar.json", "./content/vocabulary.json"];
 const resolve=path=>new URL(path,self.registration.scope).href;
 const ASSETS=new Set(FILES.map(path=>new URL(resolve(path)).pathname));

@@ -1,4 +1,8 @@
 const paths={
+company:'<path d="M3 21V7h7v14m0-12 11-6v18M1 21h22M5 10h3m-3 4h3m-3 4h3m5-8h2m3-2h1m-6 6h2m3-2h1m-6 6h2m3-2h1"/>',
+plane:'<path d="m2 13 8-2V4a2 2 0 0 1 4 0v7l8 2v3l-8-1v5l3 1v2l-5-1-5 1v-2l3-1v-5l-8 1Z"/>',
+shield:'<path d="m12 2 9 4v6c0 6-9 10-9 10S3 18 3 12V6Zm-5 10 3 3 7-7"/>',
+
 home:'<path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1Z"/>',
 book:'<path d="M12 5c-3-2-7-2-10-1v15c3-1 7-1 10 1 3-2 7-2 10-1V4c-3-1-7-1-10 1Zm0 0v15"/>',
 cards:'<rect x="6" y="6" width="15" height="15" rx="3"/><path d="M17 3H6a3 3 0 0 0-3 3v11m7-4 2 2 5-5"/>',
