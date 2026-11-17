@@ -2,6 +2,8 @@ import {LANGS,STORE,keyOf,emptyWord,parseWords,parseGrammar,parseActivity,parseB
 import {TEXT} from './i18n.js';
 import {icon} from './icons.js';
 const $=id=>document.getElementById(id),h=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const APP_VERSION='2.1.1';
+let updateState='idle',updateError=false;
 const names={en:'English',uk:'Українська',tr:'Türkçe',ar:'العربية',ru:'Русский',fa:'فارسی',es:'Español'};
 let catalog,keys,questionIds,vocabulary=null,grammar=null,wordMap=new Map(),questionMap=new Map(),vocabPromise,grammarPromise;
 let words={},results={},settings={lang:'en',theme:'light'},activity,storageOK=true,routeToken=0,toastTimer,offlineReady=false,offlineFailed=false,installPrompt=null,registration=null;
@@ -53,7 +55,7 @@ function exerciseHTML(){const s=ui.gs;if(!s)return grammarHTML();if(s.index>=s.i
 function graphHTML(){const series=chartSeries(activity,ui.chartDays,ui.chartMetric),points=series.map((d,i)=>({...d,x:32+i*304/(series.length-1)})),max=Math.max(1,...points.map(d=>d.value||0)),top=Math.ceil(max/4)*4,scale=value=>130-value/top*100;const valid=points.filter(d=>d.value!==null);let geometry='';if(ui.chartMetric==='learned'){const line=valid.map((p,i)=>`${i?'L':'M'}${p.x.toFixed(1)},${scale(p.value).toFixed(1)}`).join(' ');geometry=`<path d="${line}" class="line"/>`+valid.map(p=>`<circle class="point" cx="${p.x}" cy="${scale(p.value)}" r="3.5"><title>${p.day}: ${p.value}</title></circle>`).join('');}else geometry=valid.map(p=>`<rect class="bar" x="${p.x-3}" y="${scale(p.value)}" width="6" height="${Math.max(0,130-scale(p.value))}" rx="3"><title>${p.day}: ${p.value}</title></rect>`).join('');const labels=[0,Math.floor((points.length-1)/2),points.length-1].map(i=>`<text x="${points[i].x}" y="153" text-anchor="middle">${h(formatDay(points[i].day))}</text>`).join('');return `<svg class="chart" viewBox="0 0 360 162" role="img" aria-label="${h(t(ui.chartMetric==='learned'?'learnedWords':'activity'))}"><title>${h(t(ui.chartMetric==='learned'?'learnedWords':'activity'))}</title>${[0,top/2,top].map(n=>`<path class="grid" d="M30 ${scale(n)}H345"/><text x="23" y="${scale(n)+3}" text-anchor="end">${n}</text>`).join('')}${geometry}${labels}</svg>`;}
 function formatDay(day){return new Intl.DateTimeFormat(settings.lang,{day:'numeric',month:'short'}).format(new Date(day+'T12:00:00'));}
 function progressHTML(){const n=learned(),percent=pct(n,catalog.uniqueWordCount),g=grammarStats(),circ=2*Math.PI*49;return `<section class="screen progressScreen"><h1>${h(t('progress'))}</h1><div class="progressHero panel"><div class="donut"><svg viewBox="0 0 120 120" aria-hidden="true"><circle cx="60" cy="60" r="49" fill="none" stroke="var(--line)" stroke-width="9"/><circle cx="60" cy="60" r="49" fill="none" stroke="#92b55f" stroke-width="9" stroke-linecap="round" stroke-dasharray="${circ}" stroke-dashoffset="${circ*(1-percent/100)}"/></svg><strong>${percent}%</strong></div><div class="progressNumbers"><strong>${n}<span class="muted" style="font-size:15px"> / ${catalog.uniqueWordCount}</span></strong><p class="label">${h(t('learnedWords'))}</p><p class="small">${due()} ${h(t('due'))}</p></div></div><div class="grammarStats"><div><strong>${h(t('grammar'))} · ${g.known}/${catalog.grammarCount}</strong><p class="small">${h(t('correctLast'))}</p></div><div style="text-align:end"><strong>${g.accuracy}%</strong><p class="small">${h(t('accuracy'))}</p></div></div><div class="chartPanel panel"><div class="chartHeader"><select id="chartMetric" class="chartMetric" aria-label="${h(t('progress'))}"><option value="learned" ${ui.chartMetric==='learned'?'selected':''}>${h(t('learnedWords'))}</option><option value="activity" ${ui.chartMetric==='activity'?'selected':''}>${h(t('activity'))}</option></select><div class="segmented">${[7,30].map(n=>`<button data-act="chart-days" data-days="${n}" aria-pressed="${ui.chartDays===n}">${h(t(n===7?'last7':'last30'))}</button>`).join('')}</div></div>${graphHTML()}<p class="small">${h(t('historySince'))} ${h(formatDay(activity.started))}</p></div><div class="backupButtons"><button class="primary" data-act="export">${icon('download',18)}${h(t('backupAll'))}</button><button class="iconButton" data-act="import" aria-label="${h(t('importAll'))}">${icon('upload')}</button></div></section>`;}
-function settingsHTML(){const installed=matchMedia('(display-mode: standalone)').matches||navigator.standalone;return `<section class="screen"><h1>${h(t('settings'))}</h1><div class="settingsBlock"><div><h2>${h(t('language'))}</h2><p class="small">${h(t('languageHint'))}</p></div><select id="settingsLanguage" aria-label="${h(t('language'))}">${LANGS.map(l=>`<option value="${l}" ${settings.lang===l?'selected':''}>${names[l]}</option>`).join('')}</select></div><div class="settingsBlock"><h2>${h(t('appearance'))}</h2><div class="themeOptions">${['light','dark','system'].map(theme=>`<button class="themeOption" data-act="set-theme" data-theme="${theme}" aria-pressed="${settings.theme===theme}">${icon(theme==='light'?'sun':theme==='dark'?'moon':'settings',19)}<span>${h(t(theme))}</span></button>`).join('')}</div></div><div class="settingsBlock panel"><div class="row between"><strong style="font-size:14px">${h(t(installed?'installed':'install'))}</strong>${!installed?`<button class="iconButton" data-act="install" aria-label="${h(t('install'))}">${icon('download',18)}</button>`:icon('check',18)}</div><p class="small">${h(installed?offlineLabel():t('installHint'))}</p>${registration?.waiting?`<button class="primary wide" data-act="update">${h(t('updateNow'))}</button>`:''}</div><div class="settingsBlock"><div class="backupButtons"><button class="secondary grow" data-act="export">${h(t('backupAll'))}</button><button class="iconButton" data-act="import" aria-label="${h(t('importAll'))}">${icon('upload')}</button></div><p class="small">${h(t('savedLocal'))}</p><button class="textButton danger" data-act="reset">${h(t('resetAll'))}</button></div><div class="settingFooter"><span>Wortgarten · 2.1</span><span>${h(offlineLabel())}</span></div></section>`;}
+function settingsHTML(){const installed=matchMedia('(display-mode: standalone)').matches||navigator.standalone;return `<section class="screen"><h1>${h(t('settings'))}</h1><div class="settingsBlock"><div><h2>${h(t('language'))}</h2><p class="small">${h(t('languageHint'))}</p></div><select id="settingsLanguage" aria-label="${h(t('language'))}">${LANGS.map(l=>`<option value="${l}" ${settings.lang===l?'selected':''}>${names[l]}</option>`).join('')}</select></div><div class="settingsBlock"><h2>${h(t('appearance'))}</h2><div class="themeOptions">${['light','dark','system'].map(theme=>`<button class="themeOption" data-act="set-theme" data-theme="${theme}" aria-pressed="${settings.theme===theme}">${icon(theme==='light'?'sun':theme==='dark'?'moon':'settings',19)}<span>${h(t(theme))}</span></button>`).join('')}</div></div><div class="settingsBlock panel"><div class="row between"><strong style="font-size:14px">${h(t(installed?'installed':'install'))}</strong>${!installed?`<button class="iconButton" data-act="install" aria-label="${h(t('install'))}">${icon('download',18)}</button>`:icon('check',18)}</div><p class="small">${h(installed?offlineLabel():t('installHint'))}</p><button class="${registration?.waiting?'primary':'secondary'} wide" data-act="check-update" ${['checking','downloading'].includes(updateState)?'disabled':''}>${h(t(registration?.waiting?'updateNow':updateState==='checking'?'checkingUpdates':updateState==='downloading'?'updateDownloading':'checkUpdates'))}</button><p class="small" role="status">${h(updateError?t('updateFailed'):updateState==='current'?t('upToDate'):'')}</p></div><div class="settingsBlock"><div class="backupButtons"><button class="secondary grow" data-act="export">${h(t('backupAll'))}</button><button class="iconButton" data-act="import" aria-label="${h(t('importAll'))}">${icon('upload')}</button></div><p class="small">${h(t('savedLocal'))}</p><button class="textButton danger" data-act="reset">${h(t('resetAll'))}</button></div><div class="panel"><p class="small">${h(t('loadedContent'))}</p><strong>${catalog.wordCount} ${h(t('entries'))}</strong><p class="small">${catalog.uniqueWordCount} ${h(t('unique'))} · ${catalog.grammarCount} ${h(t('questions'))}</p></div><div class="settingFooter"><span>Wortgarten · ${APP_VERSION}</span><span>${h(offlineLabel())}</span></div></section>`;}
 async function render(keepScroll=false){const token=++routeToken,scroll=$('view').scrollTop,p=route();document.documentElement.lang=settings.lang;document.documentElement.dir=['ar','fa'].includes(settings.lang)?'rtl':'ltr';applyTheme();header();try{
  if((p[0]==='words'&&p.length>1)||p[0]==='cards'){if(!vocabulary)$('view').innerHTML=loading();await loadVocabulary();}
  if(p[0]==='grammar'&&p[1]==='exercise'){if(!grammar)$('view').innerHTML=loading();await loadGrammar();}
@@ -92,6 +94,7 @@ async function handleAction(button){const a=button.dataset.act;if(button.disable
  if(a==='import'){$('importFile').click();return;}
  if(a==='reset'){confirmReset();return;}
  if(a==='install'){if(installPrompt){const prompt=installPrompt;installPrompt=null;await prompt.prompt();await prompt.userChoice;render(true);}else toast('installLater');return;}
+ if(a==='check-update'){if(registration?.waiting){updateRequested=true;registration.waiting.postMessage({type:'SKIP_WAITING'});}else await checkForUpdates();return;}
  if(a==='update'&&registration?.waiting){updateRequested=true;registration.waiting.postMessage({type:'SKIP_WAITING'});return;}
  }catch{button.disabled=false;toast('loadError');}}
 document.addEventListener('click',event=>{const button=event.target.closest('button[data-act],button[data-go]');if(button)handleAction(button);});
@@ -108,17 +111,46 @@ window.addEventListener('appinstalled',()=>{installPrompt=null;render(true);});
 window.addEventListener('storage',event=>{if(!catalog||![STORE.words,STORE.grammar,STORE.settings,STORE.activity].includes(event.key))return;try{const data=event.newValue?JSON.parse(event.newValue):null;if(event.key===STORE.words){words=data?parseWords(data,keys):{};ui.card=null;}else if(event.key===STORE.grammar){results=data?parseGrammar(data,questionIds):{};}else if(event.key===STORE.settings&&data){if(LANGS.includes(data.lang))settings.lang=data.lang;if(['light','dark','system'].includes(data.theme))settings.theme=data.theme;}else if(event.key===STORE.activity&&data)activity=parseActivity(data,catalog.uniqueWordCount);render(true);}catch{toast('invalid');}});
 document.addEventListener('visibilitychange',()=>{if(document.hidden||!catalog)return;if(route()[0]==='cards'&&ui.card&&!ui.card.current)pickCard();if(route()[0]!=='words'&&route()[1]!=='exercise')render(true);});
 function refreshOfflineView(){if(!route().length||route()[0]==='settings')render(true);}
+const watchedWorkers=new WeakSet();
+function watchWorker(worker){
+ if(!worker||watchedWorkers.has(worker))return;watchedWorkers.add(worker);
+ const changed=()=>{
+  if(worker.state==='installed'){
+   updateState='idle';updateError=false;
+   if(navigator.serviceWorker.controller)toast('updateReady');
+   setTimeout(refreshOfflineView,0);
+  }
+  if(worker.state==='redundant'){
+   if(!offlineReady&&!registration?.active)offlineFailed=true;
+   updateState='idle';updateError=true;refreshOfflineView();
+  }
+ };
+ worker.addEventListener('statechange',changed);
+ if(['installed','redundant'].includes(worker.state))changed();
+}
+async function checkForUpdates(){
+ if(updateState==='checking'||updateState==='downloading')return;
+ if(!registration){toast('offlineUnavailable');return;}
+ updateState='checking';updateError=false;refreshOfflineView();
+ try{
+  await registration.update();
+  if(registration.waiting){updateState='idle';toast('updateReady');}
+  else if(registration.installing){updateState='downloading';watchWorker(registration.installing);}
+  else if(updateError){updateState='idle';toast('updateFailed');}
+  else{updateState='current';toast('upToDate');}
+ }catch{updateState='idle';updateError=true;toast('updateFailed');}
+ refreshOfflineView();
+}
 async function setupOffline(){
  if(!('serviceWorker'in navigator)||!window.isSecureContext){offlineFailed=true;refreshOfflineView();return;}
  try{
   registration=await navigator.serviceWorker.register(new URL('./sw.js',import.meta.url),{scope:'./',updateViaCache:'none'});
-  const watched=new WeakSet();
-  function watch(worker){if(!worker||watched.has(worker))return;watched.add(worker);worker.addEventListener('statechange',()=>{
-   if(worker.state==='installed'&&navigator.serviceWorker.controller){toast('updateReady');refreshOfflineView();}
-   if(worker.state==='redundant'&&!offlineReady&&!registration.active){offlineFailed=true;refreshOfflineView();}
-  });}
   if(registration.waiting)toast('updateReady');
-  watch(registration.installing);registration.addEventListener('updatefound',()=>watch(registration.installing));
+  watchWorker(registration.installing);
+  registration.addEventListener('updatefound',()=>{
+   if(navigator.serviceWorker.controller)updateState='downloading';
+   watchWorker(registration.installing);refreshOfflineView();
+  });
   await navigator.serviceWorker.ready;offlineReady=true;offlineFailed=false;refreshOfflineView();
  }catch{offlineFailed=true;refreshOfflineView();}
 }

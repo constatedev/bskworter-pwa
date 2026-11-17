@@ -1,11 +1,26 @@
-/* Build-generated cache version. Do not reuse a version after changing files. */
+/* Versioned, integrity-checked offline releases. Never precache stale HTTP responses. */
 const PREFIX='wortgarten-pwa:'+self.registration.scope+':';
-const CACHE=PREFIX+'97b95eeafa79cd92';
+const BUILD='43e4fbd7e8db3422';
+const CACHE=PREFIX+BUILD;
 const FILES=["./index.html", "./grammar.html", "./style.css", "./app.js", "./core.js", "./i18n.js", "./icons.js", "./manifest.webmanifest", "./assets/icon-192.png", "./assets/icon-512.png", "./assets/icon.svg", "./assets/maskable-512.png", "./content/catalog.json", "./content/grammar.json", "./content/vocabulary.json"];
+const HASHES={"./index.html": "63ea252d183712da8eefe344086a2bc979da9bd8255aad589e99c980a730b366", "./grammar.html": "f05c67723f1c2b9edde8bb0134b7965b3eaf561d8350029f2abdfb7b942f5ee4", "./style.css": "25e01e90fc996fbf0fb4ec83e23f7a11e8a7981a516a95fdb0b35da016efa9c7", "./app.js": "68104046daa0974eed82be1132d0aab635a272874c8a6bf3009748728ff5aae6", "./core.js": "26e05fe9273b757de4f0ef71ba1babdf8735fc3f2d23f54ab22b7f67b9f5b10f", "./i18n.js": "be37e6d022a6cdb84ed654aa6aa953f24f10a4207a0cdd909d2e7d331ef3fc3d", "./icons.js": "80ee35b330b3b9fff900129cc44fdfef6908659bd010a70a0b2463d0770bf17a", "./manifest.webmanifest": "de635f44ff283bae3054ef6910280c1d4a08fcc58a86ca0d0d9b1eb7b3db26e0", "./assets/icon-192.png": "15996a62306a60c8cec2185bc1bf07b77bd47615190c2cb798c31c2fa7fb675b", "./assets/icon-512.png": "5060d242aab5cb810fd2445074fc4b354e9aa54ce173ee74053277f96eb9d911", "./assets/icon.svg": "275eecd95d3a0e8eb53bd4dea7df1ad829779608703529810d453b24589c6fec", "./assets/maskable-512.png": "5060d242aab5cb810fd2445074fc4b354e9aa54ce173ee74053277f96eb9d911", "./content/catalog.json": "60476562cfde4091fccf1ae7146301b470dfaa6fd037a9c175b21a5a9aa5d6d4", "./content/grammar.json": "20bb8a58bb847c855f7448e6b9bd633b9d4e00978d5580026bea4757b4df44df", "./content/vocabulary.json": "1a9a5f44cf94629f9b1c50952a316419dc33a8eb48b17c730e6736aeeb297d7e"};
 const resolve=path=>new URL(path,self.registration.scope).href;
 const ASSETS=new Set(FILES.map(path=>new URL(resolve(path)).pathname));
+async function verifiedResponse(path){
+ const url=new URL(resolve(path));url.searchParams.set('__wg_build',BUILD);
+ const response=await fetch(new Request(url.href,{cache:'reload',credentials:'same-origin'}));
+ if(!response.ok)throw Error('Offline file unavailable: '+path);
+ const bytes=await response.clone().arrayBuffer();
+ const digest=Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',bytes)),x=>x.toString(16).padStart(2,'0')).join('');
+ if(digest!==HASHES[path])throw Error('Offline file does not match release: '+path);
+ return response;
+}
 self.addEventListener('install',event=>{
- event.waitUntil((async()=>{const cache=await caches.open(CACHE);try{await cache.addAll(FILES.map(resolve));}catch(error){await caches.delete(CACHE);throw error;}})());
+ event.waitUntil((async()=>{
+  const cache=await caches.open(CACHE);
+  try{await Promise.all(FILES.map(async path=>cache.put(resolve(path),await verifiedResponse(path))));}
+  catch(error){await caches.delete(CACHE);throw error;}
+ })());
 });
 self.addEventListener('activate',event=>{
  event.waitUntil((async()=>{await Promise.all((await caches.keys()).filter(name=>name.startsWith(PREFIX)&&name!==CACHE).map(name=>caches.delete(name)));await self.clients.claim();})());
