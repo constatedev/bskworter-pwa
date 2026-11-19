@@ -2,7 +2,7 @@ import {LANGS,STORE,keyOf,emptyWord,parseWords,parseGrammar,parseActivity,parseB
 import {TEXT} from './i18n.js';
 import {icon} from './icons.js';
 const $=id=>document.getElementById(id),h=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const APP_VERSION='2.2.0';
+const APP_VERSION='2.2.1';
 let updateState='idle',updateError=false;
 const names={en:'English',uk:'Українська',tr:'Türkçe',ar:'العربية',ru:'Русский',fa:'فارسی',es:'Español'};
 let catalog,keys,questionIds,vocabulary=null,grammar=null,wordMap=new Map(),questionMap=new Map(),vocabPromise,grammarPromise;
