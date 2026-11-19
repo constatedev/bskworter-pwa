@@ -2,3 +2,25 @@
 
 /* Keep overview screens compact; only the active screen occupies the viewport. */
 .brand .brandName{font-size:inherit;color:inherit}.homeScreen{gap:16px}.homeScreen .homeGreeting h1{font-size:29px}.homeScreen .homeStats{padding:15px 18px}.homeScreen .menuTile{min-height:122px;padding:16px;gap:12px}.homeScreen .menuTile .small{display:none}.homeScreen .menuTile .tileIcon{width:36px;height:36px}.topicCard{padding:14px;gap:8px;min-height:132px}.progressScreen{gap:12px}.progressScreen .panel{padding:12px}.progressScreen .donut{width:88px;height:88px}.progressScreen .chart{height:120px}.progressScreen .grammarStats{padding:11px 14px}.progressScreen .chartHeader{margin-bottom:8px}.progressScreen .chartPanel{padding-top:8px}.settingsBlock h2{font-size:19px}@media(max-width:500px){.compactBrand .brandName{display:none}.appHeader .brand{gap:4px}}@media(max-height:740px){.homeScreen{gap:14px}.homeScreen .homeGreeting h1{font-size:26px}.homeScreen .menuTile{min-height:110px;padding:13px;gap:10px}.homeScreen .menuTile .tileIcon{width:30px;height:30px}.homeScreen .menuTile strong{font-size:14px}.topicCard{min-height:125px;padding:12px;gap:7px}.progressScreen{gap:10px}.progressScreen .donut{width:78px;height:78px}.progressScreen .chart{height:108px}.progressScreen .grammarStats{padding:10px 12px}.progressScreen h1{font-size:26px}}
+/* Reading uses the existing app shell, with short pages and a word sheet. */
+.homeGrid .menuTile[data-go="reading"]{grid-column:1/-1;min-height:68px;flex-direction:row;align-items:center;gap:14px;padding:13px 17px}
+.homeGrid .menuTile[data-go="reading"] .tileIcon{flex-shrink:0}
+.homeGrid .menuTile[data-go="reading"] .small{display:block;margin-top:3px}
+.readingLibrary{gap:16px}.readingTextList{display:flex;flex-direction:column;gap:10px}
+.readingTextCard{display:flex;flex-direction:column;gap:7px;text-align:start;background:var(--surface);border:1px solid var(--line);border-radius:17px;padding:13px 15px}
+.readingTextCard strong{font-size:16px;line-height:1.35;overflow-wrap:anywhere}.readingTextCard .small{font-size:10px}
+.readingLibraryPager{margin-top:auto}.readingLibrary .filters select:first-child{flex:1.5}
+.readingTitle{font-size:24px;line-height:1.25;margin-top:13px}.readingTapHint{margin-top:10px}
+.readingScreen{gap:17px}.readingPassage{padding:16px 15px;display:flex;flex-direction:column;gap:18px;box-shadow:none}
+.readingBlock{display:flex;align-items:baseline;gap:10px}.readingBlock p{font-size:18px;line-height:2.05;white-space:pre-wrap;overflow-wrap:anywhere}
+.readingWord{display:inline;min-height:0;border:0;border-radius:4px;padding:2px 0;margin:0;font:inherit;font-weight:inherit;line-height:inherit;color:inherit;background:transparent;box-decoration-break:clone;-webkit-box-decoration-break:clone;text-decoration:underline;text-decoration-color:var(--line);text-underline-offset:4px;text-decoration-thickness:1px}
+.readingWord:hover,.readingWord:focus-visible{background:var(--soft);text-decoration-color:var(--primary)}.readingWord:active:not(:disabled){transform:none}
+.readingSpeaker{font-size:11px;font-weight:750;min-width:22px;padding:3px 5px;background:var(--soft);border-radius:6px;text-align:center}
+.readingControls{margin-top:auto;display:flex;flex-direction:column;gap:6px}.readingControls .pager{gap:12px}.readingControls .pager button{flex:1}
+.readingDialog{width:calc(100% - 24px);max-width:536px;max-height:75dvh;overflow:auto;margin:auto auto max(12px,env(safe-area-inset-bottom));border-radius:24px;padding:20px 20px 24px;overscroll-behavior:contain}
+.readingGlossHeader{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:8px}.readingGlossHeader .eyebrow{margin:0}
+.readingDialog h2{font-size:26px;overflow-wrap:anywhere}.readingDialog p{margin:12px 0 0;overflow-wrap:anywhere}
+.readingDialog .readingLemma{font-size:13px;color:var(--muted);line-height:1.5}.readingDialog .readingTranslation{font-size:20px;line-height:1.5;margin-top:18px}
+.readingGlossActions{display:flex;flex-wrap:wrap;gap:10px;margin-top:22px}.readingGlossActions button{display:flex;align-items:center;justify-content:center;gap:8px;flex:1;font-size:12px}.readingGlossActions svg{flex-shrink:0}
+.readingGlossActions button[aria-pressed=true]{background:var(--soft);border-color:var(--primary)}
+@media(max-height:740px){.homeScreen{gap:12px}.homeGrid .menuTile[data-go="reading"]{min-height:58px;padding:9px 13px}.homeGreeting h1{font-size:28px}.homeStats{padding:16px}.readingScreen{gap:12px}.readingPassage{padding:12px}.readingBlock p{font-size:17px;line-height:1.9}.readingTextCard{padding:10px 13px;gap:5px}.readingLibrary{gap:12px}}
