@@ -36,3 +36,38 @@
 .homeScreen .homeGrid .menuTile[data-go="reading"] .small{display:none}
 .homeScreen .menuTile[data-go="review"] .small{display:block;font-size:10px;line-height:1.4;margin-top:4px;font-variant-numeric:tabular-nums}
 @media(max-height:740px){.homeScreen .menuTile,.homeScreen .homeGrid .menuTile[data-go="reading"]{min-height:88px;padding:10px;gap:6px}.homeScreen .menuTile .tileIcon{width:26px;height:26px}}
+/* Verb course: short library pages and one tense at a time. */
+.homeExtraGrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}
+.homeScreen .homeExtraGrid .menuTile{min-height:103px;padding:11px 9px;gap:8px}
+.homeExtraGrid .menuTile strong{font-size:13px;overflow-wrap:anywhere}
+.homeScreen .homeExtraGrid .menuTile .small{display:none}
+.homeScreen .homeExtraGrid .menuTile[data-go="review"] .small{display:block;font-size:9px}
+.verbLibrary,.verbSetup,.verbDetail,.verbExercise{gap:14px}
+.verbSummary{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font-size:11px;color:var(--muted)}
+.verbButtons{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.verbButtons button{font-size:12px;padding:10px 8px;display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:5px}
+#verbListRegion{display:flex;flex:1;flex-direction:column;gap:12px}
+#verbListRegion .pager{margin-top:auto}
+.verbList{display:grid;gap:8px}
+.verbListItem{display:flex;flex-direction:column;gap:5px;text-align:start;padding:11px 13px;background:var(--surface);border:1px solid var(--line);border-radius:14px;min-width:0}
+.verbItemTop{display:flex;justify-content:space-between;align-items:center;gap:10px;width:100%;min-width:0}
+.verbItemTop strong{font-size:16px;overflow-wrap:anywhere}
+.verbMeaning{font-size:12px;color:var(--muted);overflow:hidden;white-space:nowrap;text-overflow:ellipsis;width:100%}
+.verbListItem .small{font-size:10px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;width:100%}
+.verbMeaningButton{text-align:start;padding:7px 0;font-size:16px;color:var(--muted);text-decoration:underline;text-decoration-style:dotted;text-underline-offset:4px}
+.verbDetail h1{font-size:26px;overflow-wrap:anywhere;line-height:1.25}
+.verbTenses{display:flex}.verbTenses button{flex:1;min-height:39px;font-size:13px}
+.verbTable{border-collapse:collapse;width:100%;font-size:15px;table-layout:fixed}
+.verbTable th,.verbTable td{padding:10px 8px;border-bottom:1px solid var(--line);text-align:left;overflow-wrap:anywhere;line-height:1.4}
+.verbTable th{width:34%;font-weight:500;color:var(--muted);font-size:13px}
+.verbExample{border-inline-start:3px solid var(--accent);padding-inline-start:12px;font-size:13px;line-height:1.75}
+.verbExample details>summary{min-height:44px;display:flex;align-items:center;cursor:pointer;color:var(--muted);font-size:12px;text-decoration:underline;text-underline-offset:4px}
+.verbExample details p{color:var(--muted)}
+.verbPrompt{display:flex;flex-direction:column;gap:12px;padding:22px 0}.verbPrompt h2{font-size:27px;overflow-wrap:anywhere}
+#verbForm{display:flex;flex-direction:column;gap:12px}.verbSetup select{font-size:12px;min-width:0}
+.verbProgress{cursor:pointer}.verbProgress>div:last-child{text-align:end}
+@media(max-height:740px){.homeScreen .homeExtraGrid .menuTile{min-height:88px;padding:9px 7px}.verbLibrary{gap:10px}.verbLibrary .subtitle{font-size:11px;margin-top:5px}.verbListItem{padding:9px 11px;gap:4px}.verbTable th,.verbTable td{padding:8px 6px}.verbDetail{gap:11px}.progressScreen .chart{height:96px}}
+@media(max-width:360px){.homeExtraGrid{gap:7px}.homeExtraGrid .menuTile strong{font-size:12px}.verbLibrary{gap:10px}.verbItemTop strong{font-size:14px}.verbTable{font-size:14px}}
+.verbLibrary{gap:12px}.verbLibrary .verbListItem{min-height:68px;padding:10px 13px}.verbLibrary .verbMeaning{line-height:1.5}.verbLibrary .verbButtons button{min-height:44px;padding:8px 6px}.verbLibrary .verbButtons .pill{padding:2px 6px}
+@media(max-height:740px){.verbLibrary{gap:10px}.verbLibrary .verbListItem{min-height:65px;padding:9px 11px}.verbLibrary .verbItemTop strong{font-size:15px}}
+.readingDialog .verbExample{margin-top:18px}.readingDialog .verbExample p{margin:0;font-size:15px;line-height:1.8}.readingDialog .verbExample details p{margin:8px 0}.readingDialog h2{overflow-wrap:anywhere}

@@ -1,5 +1,5 @@
 export const LANGS=['en','uk','tr','ar','ru','fa','es'];
-export const STORE={words:'wortgarten.v1',grammar:'wortgarten.grammar.v1',settings:'wortgarten.settings.v2',activity:'wortgarten.activity.v2'};
+export const STORE={words:'wortgarten.v1',grammar:'wortgarten.grammar.v1',verbs:'wortgarten.verbs.v1',settings:'wortgarten.settings.v2',activity:'wortgarten.activity.v2'};
 export const keyOf=w=>w.de.replace(/ \(Sg\.\)/g,'').trim();
 export const normalize=s=>s.normalize('NFC').trim().toLocaleLowerCase('de').replace(/ß/g,'ss').replace(/[.!?]+$/,'').replace(/\s+/g,' ');
 export const searchText=s=>s.toLocaleLowerCase('de').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/ß/g,'ss');
@@ -76,13 +76,18 @@ export function chartSeries(history,length=7,metric='learned',today=new Date()){
   days.push({day,value:day<history.started?null:metric==='learned'?previous:(r?r.reviews+r.grammar:0)});
  }return days;
 }
-export function parseBackup(data,keys,ids,maxWords){
+export function parseVerbs(data,ids){
+ if(!object(data)||data.app!=='WortgartenVerbs')throw Error('Invalid verb backup');
+ return parseGrammar({...data,app:'WortgartenGrammar'},ids);
+}
+export function parseBackup(data,keys,ids,maxWords,verbIds=new Set()){
  if(!object(data))throw Error('Invalid backup');
  if(data.app==='WortgartenPWA'&&data.version===2){
   const words=parseWords(data.vocabulary,keys),grammar=parseGrammar(data.grammar,ids);
   const activity=data.activity?parseActivity(data.activity,maxWords):null;
-  return {words,grammar,activity};
+  return {words,grammar,activity,...(data.verbs?{verbs:parseVerbs(data.verbs,verbIds)}:{})};
  }
+ if(data.app==='WortgartenVerbs')return {verbs:parseVerbs(data,verbIds)};
  if(data.app==='WortgartenGrammar')return {grammar:parseGrammar(data,ids)};
  return {words:parseWords(data,keys)};
 }
