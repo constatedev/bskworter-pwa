@@ -26,13 +26,34 @@ export function schedule(old,rating,now=Date.now()){
 }
 export const mergeLatest=(old,incoming)=>{const result={...old};for(const [k,v]of Object.entries(incoming))if(!result[k]||v.updated>=result[k].updated)result[k]={...v};return result;};
 export function deduplicate(words){const seen=new Set();return words.filter(w=>{const k=keyOf(w);if(seen.has(k))return false;seen.add(k);return true;});}
-export function cardPool(words,progress,{topic='all',deck='due',skipped=new Set(),now=Date.now()}={}){
- const filtered=deduplicate(words.filter(w=>topic==='all'||w.topic===topic)).filter(w=>{
-  const s=progress[keyOf(w)]||emptyWord();if(skipped.has(keyOf(w)))return false;
-  return deck==='star'?s.star:deck==='new'?!s.known:deck==='due'?s.due<=now:true;
+export const needsRetry=record=>!!record&&!record.known&&record.due>0;
+function scopedCards(words,progress,{topic='all',deck='due',skipped=new Set()}={}){
+ return deduplicate(words.filter(w=>topic==='all'||w.topic===topic)).filter(w=>{
+  const k=keyOf(w),record=progress[k]||emptyWord();
+  return !skipped.has(k)&&(deck!=='star'||record.star)&&(deck!=='new'||!record.known);
  });
- if(deck==='due')filtered.sort((a,b)=>{const x=progress[keyOf(a)]?.due||0,y=progress[keyOf(b)]?.due||0;return (x===0)-(y===0)||x-y;});
- return filtered;
+}
+export function retryState(words,progress,options={}){
+ const now=options.now??Date.now(),pending=scopedCards(words,progress,options).filter(w=>needsRetry(progress[keyOf(w)]));
+ const ready=pending.filter(w=>progress[keyOf(w)].due<=now).length;
+ const future=pending.map(w=>progress[keyOf(w)].due).filter(due=>due>now);
+ return {ready,waiting:future.length,total:pending.length,next:future.length?Math.min(...future):null};
+}
+export function cardPool(words,progress,{topic='all',deck='due',skipped=new Set(),now=Date.now(),random=Math.random,includeFuture=false}={}){
+ const filtered=shuffle(scopedCards(words,progress,{topic,deck,skipped}).filter(w=>{
+  const record=progress[keyOf(w)]||emptyWord();
+  if(deck==='retry')return needsRetry(record)&&(includeFuture||record.due<=now);
+  if(needsRetry(record)&&record.due>now)return false;
+  return deck!=='due'||record.due<=now;
+ }),random);
+ // Timed learning repeats take priority; random order is retained within each group.
+ const retries=[],scheduled=[],rest=[];
+ for(const word of filtered){const record=progress[keyOf(word)]||emptyWord();
+  if(needsRetry(record)&&record.due<=now)retries.push(word);
+  else if(deck==='due'&&record.due>0)scheduled.push(word);
+  else rest.push(word);
+ }
+ return [...retries,...scheduled,...rest];
 }
 export function dayKey(date=new Date()){return `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')}`;}
 const validDay=s=>/^\d{4}-\d{2}-\d{2}$/.test(s)&&!Number.isNaN(new Date(s+'T12:00:00').getTime())&&dayKey(new Date(s+'T12:00:00'))===s;
@@ -67,4 +88,4 @@ export function parseBackup(data,keys,ids,maxWords){
 }
 export const evaluate=(question,answer)=>(question.accepted||[question.answer]).some(a=>normalize(a)===normalize(answer));
 export function grammarResult(old,correct,now=Date.now()){return {attempts:(old?.attempts||0)+1,correct:(old?.correct||0)+(correct?1:0),lastCorrect:correct,updated:now};}
-export function shuffle(array){const a=[...array];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+export function shuffle(array,random=Math.random){const a=[...array];for(let i=a.length-1;i>0;i--){const j=Math.floor(random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}

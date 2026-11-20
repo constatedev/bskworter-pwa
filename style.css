@@ -24,3 +24,15 @@
 .readingGlossActions{display:flex;flex-wrap:wrap;gap:10px;margin-top:22px}.readingGlossActions button{display:flex;align-items:center;justify-content:center;gap:8px;flex:1;font-size:12px}.readingGlossActions svg{flex-shrink:0}
 .readingGlossActions button[aria-pressed=true]{background:var(--soft);border-color:var(--primary)}
 @media(max-height:740px){.homeScreen{gap:12px}.homeGrid .menuTile[data-go="reading"]{min-height:58px;padding:9px 13px}.homeGreeting h1{font-size:28px}.homeStats{padding:16px}.readingScreen{gap:12px}.readingPassage{padding:12px}.readingBlock p{font-size:17px;line-height:1.9}.readingTextCard{padding:10px 13px;gap:5px}.readingLibrary{gap:12px}}
+/* A visible, compact queue for the two learning ratings. */
+.retryPanel{display:flex;flex-wrap:wrap;align-items:center;gap:3px 10px;background:var(--soft);border:1px solid var(--line);border-radius:14px;padding:8px 12px}
+.retryDeckButton{display:flex;align-items:center;gap:7px;text-align:start;padding:4px 0;min-height:30px;font-size:12px;flex:1;min-width:0}
+.retryDeckButton svg{flex-shrink:0}.retryDeckButton[aria-pressed=true]{color:var(--primary)}
+.retryPanel>.small{font-size:10px}.retryPanel .retryCountdown{flex-basis:100%;font-variant-numeric:tabular-nums}
+/* Six compact home entries; the bottom bar still contains five tabs. */
+.homeScreen .menuTile{min-height:100px;padding:12px;gap:8px}
+.homeScreen .menuTile .tileIcon{width:30px;height:30px}
+.homeScreen .homeGrid .menuTile[data-go="reading"]{grid-column:auto;flex-direction:column;align-items:flex-start;min-height:100px;padding:12px;gap:8px}
+.homeScreen .homeGrid .menuTile[data-go="reading"] .small{display:none}
+.homeScreen .menuTile[data-go="review"] .small{display:block;font-size:10px;line-height:1.4;margin-top:4px;font-variant-numeric:tabular-nums}
+@media(max-height:740px){.homeScreen .menuTile,.homeScreen .homeGrid .menuTile[data-go="reading"]{min-height:88px;padding:10px;gap:6px}.homeScreen .menuTile .tileIcon{width:26px;height:26px}}
