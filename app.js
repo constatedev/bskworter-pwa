@@ -4,7 +4,7 @@ import {icon} from './icons.js';
 import {readingPages,readingLookup} from './reading.js';
 import {createVerbCourse,verbQuestionIds} from './verbs.js';
 const $=id=>document.getElementById(id),h=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const APP_VERSION='2.5.0';
+const APP_VERSION='2.5.1';
 let updateState='idle',updateError=false,cardTimer,cardRoute='cards';
 const names={en:'English',uk:'Українська',tr:'Türkçe',ar:'العربية',ru:'Русский',fa:'فارسی',es:'Español'};
 let catalog,keys,questionIds,vocabulary=null,grammar=null,wordMap=new Map(),questionMap=new Map(),vocabPromise,grammarPromise,reading=null,readingPromise;
